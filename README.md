@@ -6,11 +6,11 @@ Hardcoded the name to recreate mindee's work.
 The task took 4 hours to complete
 
 Stack:
-.NET 7
-Telegram.Bot
-
+<li>.NET 7</li>
+<li>Telegram.Bot</li></br>
 Telegram bot: <a href="https://t.me/DiceusTestTaskBot">Click</a>
 
-Screenshot:
+
+Screenshot:</br>
 ![image](https://github.com/kelass/TelegramBot/assets/69418373/45b09d9d-c34f-4977-9b43-ffe22e5a18af)
 
