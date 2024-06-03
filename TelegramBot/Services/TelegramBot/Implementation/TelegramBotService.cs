@@ -105,11 +105,11 @@ namespace TelegramBot.Services.TelegramBot.Implementation
 
             if (message?.Type == MessageType.Text)
             {
-                await MessageText(message);
+                await MessageGptText(message);
             }
             else if (message?.Type == MessageType.Photo)
             {
-                await MessagePhoto(message);
+                await MessageGptPhoto(message);
             }
         }
 
@@ -179,15 +179,27 @@ namespace TelegramBot.Services.TelegramBot.Implementation
             {
                 if (message.Text.ToLower() == "/accept")
                 {
-                    var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Data confirmed. The cost of the insurance is 100 USD. Do you agree?'");
+                    var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Data confirmed. The cost of the insurance is 100 USD. Do you agree?\n Click /yes if you agree\n Click /no if dont agree'");
                     await _botClient.SendTextMessageAsync(message.Chat.Id, text);
                 }
-                else if (message.Text.ToLower() == "yes")
+                else if (message.Text.ToLower() == "/yes")
                 {
                     var policy = _mindeeService.SimulateMindeeAPI();
-                    var text = await _chatGptService.Chat("generate text of a similar nature with more water :'The policy has been successfully established:\n{policy}'");
+                    var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data create policy data for five years from today.:'The policy has been successfully established:\n{policy}'");
                     await _botClient.SendTextMessageAsync(message.Chat.Id, text);
                     userDocuments.Remove(message.Chat.Id);
+                }
+                else if (message.Text.ToLower() == "/no")
+                {
+                    var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Sorry this is the only price available at the moment\n Press /yes if you agree to continue or /exit if you want to finish'");
+
+                    await _botClient.SendTextMessageAsync(message.Chat.Id, text);
+                }
+                else if (message.Text.ToLower() == "/exit")
+                {
+                    var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Thank you for using our bot'");
+                    userDocuments.Remove(message.Chat.Id);
+                    await _botClient.SendTextMessageAsync(message.Chat.Id, text);
                 }
                 else
                 {
@@ -221,7 +233,7 @@ namespace TelegramBot.Services.TelegramBot.Implementation
             else if (userDocuments[message.Chat.Id].Count == 2)
             {
                 var extractedData = _mindeeService.SimulateMindeeAPI();
-                var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Extracted Data:\n{extractedData}\nPlease confirm the data (click to /accept or send a new photo).'");
+                var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data and dont remember write /accept :'Extracted Data:\n{extractedData}\nPlease confirm the data (click to /accept or send a new photo).'");
                 await _botClient.SendTextMessageAsync(message.Chat.Id, text);
             }
         }

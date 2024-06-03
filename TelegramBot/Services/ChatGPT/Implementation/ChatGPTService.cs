@@ -16,38 +16,32 @@ namespace TelegramBot.Services.ChatGPT.Implementation
 
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
-            while (true)
+            var message = new Message() { Role = "user", Content = content };
+            messages.Add(message);
+
+            var requestData = new Request()
             {
-                if (content is not { Length: > 0 }) break;
-                var message = new Message() { Role = "user", Content = content };
-                messages.Add(message);
+                ModelId = "gpt-3.5-turbo",
+                Messages = messages
+            };
+            using var response = await httpClient.PostAsJsonAsync(_endpoint, requestData);
 
-                var requestData = new Request()
-                {
-                    ModelId = "gpt-3.5-turbo",
-                    Messages = messages
-                };
-                using var response = await httpClient.PostAsJsonAsync(_endpoint, requestData);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"{(int)response.StatusCode} {response.StatusCode}");
-                    break;
-                }
-                ResponseData? responseData = await response.Content.ReadFromJsonAsync<ResponseData>();
-
-                var choices = responseData?.Choices ?? new List<Choice>();
-                if (choices.Count == 0)
-                {
-                    Console.WriteLine("No choices were returned by the API");
-                    continue;
-                }
-                var choice = choices[0];
-                var responseMessage = choice.Message;
-                messages.Add(responseMessage);
-                _responseText = responseMessage.Content.Trim();
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"{(int)response.StatusCode} {response.StatusCode}");
+                return response.StatusCode.ToString();
             }
-            return _responseText;
+            ResponseData? responseData = await response.Content.ReadFromJsonAsync<ResponseData>();
+
+            var choices = responseData?.Choices ?? new List<Choice>();
+            if (choices.Count == 0)
+            {
+                Console.WriteLine("No choices were returned by the API");
+            }
+            var choice = choices[0];
+            var responseMessage = choice.Message;
+            messages.Add(responseMessage);
+            return responseMessage.Content.Trim();
         }
     }
 }

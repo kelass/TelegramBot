@@ -23,8 +23,8 @@ namespace TelegramBot
             using var host = CreateHostBuilder(args).Build();
 
             var _telegramBotService = host.Services.GetRequiredService<ITelegramBotService>();
-            await _telegramBotService.InitializeBotAsync();
-            //await _telegramBotService.InitializeBotWithChatGPTAsync(); // IF YOU HAVE TOKENS IN OPENAI start this method
+            //await _telegramBotService.InitializeBotAsync();
+            await _telegramBotService.InitializeBotWithChatGPTAsync(); // IF YOU HAVE TOKENS IN OPENAI start this method
         }
     }
 }
