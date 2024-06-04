@@ -8,9 +8,11 @@ The task took 7 hours to complete
 
 Stack:
 <li>.NET 7</li>
-<li>Telegram.Bot</li></br>
-<li>Mindee API</li></br>
-<li>OpenAI ChatGPT</li>
+<li>Telegram.Bot</li>
+<li>Mindee API</li>
+<li>OpenAI ChatGPT</li></br>
+
+
 Telegram bot: <a href="https://t.me/DiceusTestTaskBot">Click</a>
 
 Write /start in telegram bot chat that start the chat
