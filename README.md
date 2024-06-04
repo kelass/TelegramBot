@@ -1,6 +1,7 @@
 # TelegramBot
 You can run the version with message generation with chatgpt - Program.cs commented out method. If you have a token - you need to enter it into ChatGPTService.</br>
 
+
 Hardcoded the name to recreate mindee's work.
 
 The task took 7 hours to complete
@@ -11,6 +12,8 @@ Stack:
 <li>Mindee API</li></br>
 <li>OpenAI ChatGPT</li>
 Telegram bot: <a href="https://t.me/DiceusTestTaskBot">Click</a>
+
+Write /start in telegram bot chat that start the chat
 
 
 Screenshot:</br>
