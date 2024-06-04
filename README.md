@@ -17,6 +17,13 @@ Telegram bot: <a href="https://t.me/DiceusTestTaskBot">Click</a>
 
 Write /start in telegram bot chat that start the chat
 
+Commands:
+/start
+/accept
+/yes
+/no
+/exit
+
 
 Screenshot:</br>
 ![image](https://github.com/kelass/TelegramBot/assets/69418373/45b09d9d-c34f-4977-9b43-ffe22e5a18af)
