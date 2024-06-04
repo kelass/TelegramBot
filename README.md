@@ -1,5 +1,4 @@
 # TelegramBot
-
 You can run the version with message generation with chatgpt - Program.cs commented out method. If you have a token - you need to enter it into ChatGPTService.</br>
 
 Hardcoded the name to recreate mindee's work.
