@@ -6,7 +6,7 @@ You can run the version with message generation with chatgpt - Program.cs commen
 
 Hardcoded the name to recreate mindee's work.
 
-The task took 5 hours to complete
+The task took 7 hours to complete
 
 Stack:
 <li>.NET 7</li>
