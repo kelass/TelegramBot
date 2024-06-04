@@ -3,6 +3,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBot.Services.ChatGPT.Interface;
+using TelegramBot.Services.FileSaver.Interface;
 using TelegramBot.Services.Mindee.Interface;
 using TelegramBot.Services.TelegramBot.Interface;
 
@@ -12,14 +13,19 @@ namespace TelegramBot.Services.TelegramBot.Implementation
     {
         private string _botToken = "7159002536:AAF-g3o-PRb5RgMT8bvQCYa_n3WZdF9Jm2w";
         private ITelegramBotClient _botClient;
+        private string Name = string.Empty;
         private Dictionary<long, List<Telegram.Bot.Types.File>> userDocuments = new();
         private readonly IMindeeService _mindeeService;
         private readonly IChatGPTService _chatGptService;
+        private readonly IFileSaverService _fileSaverService;
+        private string passportData = string.Empty;
+        private string licenseData = string.Empty;
 
-        public TelegramBotService(IMindeeService mindeeService, IChatGPTService chatGptService)
+        public TelegramBotService(IMindeeService mindeeService, IChatGPTService chatGptService, IFileSaverService fileSaverService)
         {
             _mindeeService = mindeeService;
             _chatGptService = chatGptService;
+            _fileSaverService = fileSaverService;
         }
 
         public async Task InitializeBotAsync()
@@ -127,15 +133,14 @@ namespace TelegramBot.Services.TelegramBot.Implementation
                 }
                 else if (message.Text.ToLower() == "/yes")
                 {
-                    var policy = _mindeeService.SimulateMindeeAPI();
-                    await _botClient.SendTextMessageAsync(message.Chat.Id, $"The policy has been successfully established:\n{policy}");
+                    await _botClient.SendTextMessageAsync(message.Chat.Id, $"The policy has been successfully established:\n{passportData + licenseData}");
                     userDocuments.Remove(message.Chat.Id);
                 }
-                else if(message.Text.ToLower() == "/no")
+                else if (message.Text.ToLower() == "/no")
                 {
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Sorry this is the only price available at the moment\n Press /yes if you agree to continue or /exit if you want to finish ");
                 }
-                else if(message.Text.ToLower() == "/exit")
+                else if (message.Text.ToLower() == "/exit")
                 {
                     userDocuments.Remove(message.Chat.Id);
                     await _botClient.SendTextMessageAsync(message.Chat.Id, "Thank you for using our bot");
@@ -159,12 +164,15 @@ namespace TelegramBot.Services.TelegramBot.Implementation
 
             if (userDocuments[message.Chat.Id].Count == 1)
             {
+                var filePath = await _fileSaverService.SaveFile(file, _botClient);
+                passportData = await _mindeeService.PostPasportMindeeAPI(Path.Combine("files", filePath));
                 await _botClient.SendTextMessageAsync(message.Chat.Id, "Passport photo received. Please send a photo of the vehicle identification document.");
             }
             else if (userDocuments[message.Chat.Id].Count == 2)
             {
-                var extractedData = _mindeeService.SimulateMindeeAPI();
-                await _botClient.SendTextMessageAsync(message.Chat.Id, $"Extracted Data:\n{extractedData}\nPlease confirm the data (click to /accept or send a new photo).");
+                var filePath = await _fileSaverService.SaveFile(file, _botClient);
+                licenseData = await _mindeeService.PostLicenceMindeeAPI(Path.Combine("files", filePath));
+                await _botClient.SendTextMessageAsync(message.Chat.Id, $"{passportData + licenseData}\nPlease confirm the data (click to /accept or send a new photo).");
             }
         }
 
@@ -184,8 +192,7 @@ namespace TelegramBot.Services.TelegramBot.Implementation
                 }
                 else if (message.Text.ToLower() == "/yes")
                 {
-                    var policy = _mindeeService.SimulateMindeeAPI();
-                    var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data create policy data for five years from today.:'The policy has been successfully established:\n{policy}'");
+                    var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data create policy data for five years from today.:'The policy has been successfully established:\n{passportData + licenseData}'");
                     await _botClient.SendTextMessageAsync(message.Chat.Id, text);
                     userDocuments.Remove(message.Chat.Id);
                 }
@@ -227,13 +234,16 @@ namespace TelegramBot.Services.TelegramBot.Implementation
 
             if (userDocuments[message.Chat.Id].Count == 1)
             {
+                var filePath = await _fileSaverService.SaveFile(file, _botClient);
+                passportData = await _mindeeService.PostPasportMindeeAPI(Path.Combine("files", filePath));
                 var text = await _chatGptService.Chat("generate text of a similar nature with more water :'Passport photo received. Please send a photo of the vehicle identification document.'");
                 await _botClient.SendTextMessageAsync(message.Chat.Id, text);
             }
             else if (userDocuments[message.Chat.Id].Count == 2)
             {
-                var extractedData = _mindeeService.SimulateMindeeAPI();
-                var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data and dont remember write /accept :'Extracted Data:\n{extractedData}\nPlease confirm the data (click to /accept or send a new photo).'");
+                var filePath = await _fileSaverService.SaveFile(file, _botClient);
+                licenseData = await _mindeeService.PostLicenceMindeeAPI(Path.Combine("files", filePath));
+                var text = await _chatGptService.Chat($"add more text to the given text without changing the sensitive data and dont remember write /accept :'Extracted Data:\n{passportData + licenseData}\nPlease confirm the data (click to /accept or send a new photo).'");
                 await _botClient.SendTextMessageAsync(message.Chat.Id, text);
             }
         }
