@@ -2,7 +2,6 @@
 {
     public interface ITelegramBotService
     {
-        Task InitializeBotAsync();
         Task InitializeBotWithChatGPTAsync();
     }
 }

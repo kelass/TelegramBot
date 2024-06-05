@@ -8,7 +8,7 @@ namespace TelegramBot.Services.Mindee.Implementation
 {
     public class MindeeService : IMindeeService
     {
-        string apiKey = "0b73ba4b105d4adc6855a07aad3356f7";
+        string apiKey = "4e221ec18d47aa92ff63e44a8e5eebf6";
 
         public string SimulateMindeeAPI()
         {
@@ -17,31 +17,45 @@ namespace TelegramBot.Services.Mindee.Implementation
 
         public async Task<string> PostLicenceMindeeAPI(string file)
         {
-            MindeeClient mindeeClient = new MindeeClient(apiKey);
+            try
+            {
+                MindeeClient mindeeClient = new MindeeClient(apiKey);
 
-            var inputSource = new LocalInputSource(file);
+                var inputSource = new LocalInputSource(file);
 
-            var response = await mindeeClient
-                .ParseAsync<DriverLicenseV1>(inputSource);
+                var response = await mindeeClient
+                    .ParseAsync<DriverLicenseV1>(inputSource);
 
-            return $"First/Last names: {response.Document.Inference.Prediction.FirstName}/ {response.Document.Inference.Prediction.LastName}\n " +
-                $"Address: {response.Document.Inference.Prediction.Address}" +
-                $"Driver licencse ID: {response.Document.Inference.Prediction.DriverLicenseId}\n";
+                return $"First/Last names: {response.Document.Inference.Prediction.FirstName}/ {response.Document.Inference.Prediction.LastName}\n " +
+                    $"Address: {response.Document.Inference.Prediction.Address}" +
+                    $"Driver licencse ID: {response.Document.Inference.Prediction.DriverLicenseId}\n";
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
         }
 
         public async Task<string> PostPasportMindeeAPI(string file)
         {
-            MindeeClient mindeeClient = new MindeeClient(apiKey);
+            try
+            {
+                MindeeClient mindeeClient = new MindeeClient(apiKey);
 
-            var inputSource = new LocalInputSource(file);
+                var inputSource = new LocalInputSource(file);
 
-            var response = await mindeeClient
-            .EnqueueAndParseAsync<InternationalIdV2>(inputSource);
+                var response = await mindeeClient
+                .EnqueueAndParseAsync<InternationalIdV2>(inputSource);
 
-            return $"Extracted data:\n" +
-                $" Document number: {response.Document.Inference.Prediction.DocumentNumber}\n" +
-                $" Birth date: {response.Document.Inference.Prediction.BirthDate}\n" +
-                $" Exp date: {response.Document.Inference.Prediction.ExpiryDate}\n";
+                return $"Extracted data:\n" +
+                    $" Document number: {response.Document.Inference.Prediction.DocumentNumber}\n" +
+                    $" Birth date: {response.Document.Inference.Prediction.BirthDate}\n" +
+                    $" Exp date: {response.Document.Inference.Prediction.ExpiryDate}\n";
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
         }
     }
 }
